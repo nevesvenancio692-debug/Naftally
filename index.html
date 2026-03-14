@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para Naftally 💝</title>
+    <style>
+        :root {
+            --red: #e74c3c;
+            --gray: #7f8c8d;
+            --dark-gray: #2c3e50;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #canvas-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Botão Inicial */
+        #start-btn {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background-color: var(--red);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            transition: transform 0.2s;
+        }
+
+        #start-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Elementos SVG */
+        #main-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* Coração */
+        #heart-path {
+            fill: none;
+            stroke: var(--red);
+            stroke-width: 5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+        }
+
+        /* Robô */
+        #robot {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            display: none;
+            transform-origin: center;
+            z-index: 10;
+        }
+
+        .wheel {
+            fill: var(--dark-gray);
+        }
+
+        .spinning {
+            animation: spin 0.5s linear infinite;
+            transform-origin: center;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Texto dentro do coração */
+        #text-container {
+            position: absolute;
+            width: 280px; /* Ajustado para caber no coração mobile */
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            pointer-events: none;
+            clip-path: url(#heart-clip); /* Máscara do coração */
+        }
+
+        #message {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            padding: 20px;
+            font-weight: 500;
+            opacity: 0;
+        }
+
+        /* Efeito de Clique */
+        .ripple {
+            position: absolute;
+            border: 2px solid var(--red);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple-effect 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-effect {
+            to { transform: scale(4); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="canvas-container">
+    <button id="start-btn">Clique para ver 💝</button>
+
+    <div id="text-container">
+        <div id="message"></div>
+    </div>
+
+    <svg id="main-svg">
+        <defs>
+            <clipPath id="heart-clip">
+                <path d="M150,80 C150,80 130,30 80,30 C30,30 30,100 30,100 C30,140 150,230 150,230 C150,230 270,140 270,100 C270,100 270,30 220,30 C170,30 150,80 150,80 Z" transform="scale(1.1) translate(-15, -15)"></path>
+            </clipPath>
+        </defs>
+        <path id="heart-path" d="M150,80 C150,80 130,30 80,30 C30,30 30,100 30,100 C30,140 150,230 150,230 C150,230 270,140 270,100 C270,100 270,30 220,30 C170,30 150,80 150,80 Z" />
+    </svg>
+
+    <div id="robot">
+        <svg viewBox="0 0 100 100">
+            <rect x="25" y="20" width="50" height="45" rx="5" fill="#bdc3c7" />
+            <rect x="30" y="25" width="40" height="30" rx="2" fill="#ecf0f1" />
+            <circle cx="50" cy="40" r="5" fill="#e74c3c" />
+            <rect x="35" y="15" width="30" height="5" fill="#e74c3c" />
+            <g class="wheel-group">
+                <circle class="wheel spinning" cx="30" cy="70" r="10" />
+                <line x1="25" y1="70" x2="35" y2="70" stroke="white" stroke-width="2" />
+            </g>
+            <g class="wheel-group">
+                <circle class="wheel spinning" cx="70" cy="70" r="10" />
+                <line x1="65" y1="70" x2="75" y2="70" stroke="white" stroke-width="2" />
+            </g>
+            <rect id="arm" x="75" y="35" width="20" height="8" rx="4" fill="#7f8c8d" transform-origin="75 39" />
+            <path d="M50,65 L50,85" stroke="#2c3e50" stroke-width="3" />
+        </svg>
+    </div>
+</div>
+
+<script>
+    const startBtn = document.getElementById('start-btn');
+    const robot = document.getElementById('robot');
+    const heartPath = document.getElementById('heart-path');
+    const messageDiv = document.getElementById('message');
+    const arm = document.getElementById('arm');
+    const wheels = document.querySelectorAll('.wheel');
+
+    const fullMessage = "Naftally,\n\nMesmo a gente se conhecendo há poucos dias, você já conseguiu se tornar alguém muito especial para mim. Seu jeito, seu sorriso e a forma como você fala comigo fazem meus dias ficarem melhores.\n\nAinda estamos no começo, mas eu já gosto muito de ter você por perto.\n\nTe amo. ❤️";
+
+    function typeWriter(text, i, fnCallback) {
+        if (i < text.length) {
+            messageDiv.innerHTML = text.substring(0, i + 1).replace(/\n/g, '<br>');
+            setTimeout(() => typeWriter(text, i + 1, fnCallback), 40);
+        } else if (typeof fnCallback == 'function') {
+            fnCallback();
+        }
+    }
+
+    startBtn.addEventListener('click', () => {
+        startBtn.style.display = 'none';
+        robot.style.display = 'block';
+        
+        const pathLength = heartPath.getTotalLength();
+        heartPath.style.strokeDasharray = pathLength;
+        heartPath.style.strokeDashoffset = pathLength;
+
+        let progress = 0;
+        const duration = 5000; // 5 segundos para desenhar
+        const startTime = performance.now();
+
+        function animate(time) {
+            let elapsed = time - startTime;
+            progress = Math.min(elapsed / duration, 1);
+
+            // Move o robô ao longo do path
+            const point = heartPath.getPointAtLength(progress * pathLength);
+            const containerRect = document.getElementById('main-svg').getBoundingClientRect();
+            
+            // Centraliza o robô no desenho
+            robot.style.left = `${point.x - 30}px`;
+            robot.style.top = `${point.y - 45}px`;
+
+            // Desenha a linha
+            heartPath.style.strokeDashoffset = pathLength * (1 - progress);
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                // Para as rodas e vai para a lateral
+                wheels.forEach(w => w.classList.remove('spinning'));
+                setTimeout(moveAside, 500);
+            }
+        }
+
+        requestAnimationFrame(animate);
+    });
+
+    function moveAside() {
+        wheels.forEach(w => w.classList.add('spinning'));
+        const targetX = window.innerWidth - 70;
+        const currentTop = parseFloat(robot.style.top);
+        
+        robot.style.transition = "left 2s ease-in-out";
+        robot.style.left = `${targetX}px`;
+
+        setTimeout(() => {
+            wheels.forEach(w => w.classList.remove('spinning'));
+            raiseArm();
+        }, 2000);
+    }
+
+    function raiseArm() {
+        arm.style.transition = "transform 0.5s ease";
+        arm.style.transform = "rotate(-45deg)";
+        
+        setTimeout(() => {
+            createRipple(window.innerWidth - 10, parseFloat(robot.style.top) + 40);
+            arm.style.transform = "rotate(0deg)";
+            
+            // Começa o texto
+            messageDiv.style.opacity = "1";
+            typeWriter(fullMessage, 0);
+        }, 600);
+    }
+
+    function createRipple(x, y) {
+        const ripple = document.createElement('div');
+        ripple.className = 'ripple';
+        ripple.style.left = `${x - 20}px`;
+        ripple.style.top = `${y - 20}px`;
+        ripple.style.width = '40px';
+        ripple.style.height = '40px';
+        document.body.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+    }
+
+</script>
+
+</body>
+</html>
